@@ -1,4 +1,3 @@
-
 import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 
@@ -16,6 +15,18 @@ const Company = sequelize.define('Company', {
   description:{
     type: DataTypes.TEXT
   },
+  email:{
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  contact:{
+    type: DataTypes.BIGINT,
+    allowNull: false
+  },
+  password:{
+    type:DataTypes.STRING(255),
+    allowNull: true
+  },
   No_of_Emp: {
     type: DataTypes.RANGE(DataTypes.INTEGER), // Range of integers
     allowNull: true,
@@ -31,11 +42,11 @@ const Company = sequelize.define('Company', {
   },
   foundedIn: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
   CEO: {
     type: DataTypes.STRING(255),
-    allowNull: false,
+    allowNull: true,
   },
 }, {
   tableName: 'Company',

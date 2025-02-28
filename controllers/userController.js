@@ -1,6 +1,9 @@
+import fs from 'fs';
+
 import { verifyToken } from "../lib/jwtVerification.js";
 import { empEducation } from "../models/empEducation.js";
 import { empExperience } from "../models/empExperienceModel.js";
+import { Employee } from "../models/EmployeesModel.js";
 import { employeesOverview } from "../models/employeesOverviewModel.js";
 import { empPreference } from "../models/empPreferenceModel.js";
 
@@ -42,6 +45,144 @@ const addOverview = async (ctx) =>{
     message:"Overview added successfully"
   }
 }
+
+//TO ADD IMAGES
+const addImg = async (ctx) =>{
+  const file = ctx.req.file;
+  const id = verifyToken(ctx);
+  if(!id)
+  {
+    ctx.status = 403;
+    ctx.body = {
+      message: "Login session expired"
+    }
+    return;
+  }
+  if(!file)
+  {
+    ctx.status = 400;
+    ctx.body = {
+      message: "Please upload image"
+    }
+    return;
+  }
+  const emp = await Employee.findOne({where: {id}});
+  if(emp.image)
+  {
+    console.log(" fileInfo", {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      path: file.path,
+      size: file.size,
+    });
+    fs.unlink(file.path, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err); // Log the error for debugging
+        ctx.status = 500;
+        ctx.body = { error: 'Failed to delete the image' };
+        return;
+      }
+    });
+    ctx.status = 400;
+    ctx.body = {
+      message: "You cannot upload more than one image"
+    }
+    return
+  }
+  await Employee.update({ image: file.path},{where: {id} })
+   ctx.status = 202;
+   ctx.body = {
+     message: 'File uploaded successfully',
+     fileInfo: {
+       originalname: file.originalname,
+       mimetype: file.mimetype,
+       path: file.path,
+       size: file.size,
+     },
+   };
+}
+
+//TO DELETE IMAGE 
+const dltImg = async (ctx) => {
+  const { filePath } = ctx.request.body; 
+  const id = verifyToken(ctx);
+  if (!id) {
+    ctx.status = 403;
+    ctx.body = {
+      message: "Login session expired",
+    };
+    return;
+  }
+  const emp = await Employee.findOne({where:{id}})
+
+  if (!filePath) {
+    ctx.status = 400;
+    ctx.body = { error: 'File path is required' };
+    return;
+  }
+  // Validate the filePath input
+  if (!emp.image) {
+    ctx.status = 404;
+    ctx.body = { error: 'No image found' };
+    return;
+  }
+
+  // Update the employee record to set image to null
+  await Employee.update({ image: null }, { where: { id } });
+
+  // Use fs.unlink to delete the file
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err); // Log the error for debugging
+      ctx.status = 500;
+      ctx.body = { error: 'Failed to delete the image' };
+      return;
+    }
+  });
+  ctx.status =200
+  ctx.body = { message: 'Image deleted successfully' };
+};
+
+//TO UPDATE IMAGE
+const updateImg = async (ctx) => {
+  const file = ctx.req.file;
+  const id = verifyToken(ctx);
+  if (!id) {
+    ctx.status = 403;
+    ctx.body = {
+      message: "Login session expired",
+    };
+    return;
+  }
+  const emp = await Employee.findOne({where:{id}})
+  const filePath = emp.image
+  console.log(filePath)
+  if (!filePath) {
+    ctx.status = 404;
+    ctx.body = { error: 'No image found' };
+    return;
+  }
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err); // Log the error for debugging
+      ctx.status = 500;
+      ctx.body = { error: 'Failed to delete the image' };
+      return;
+    }
+  });
+  console.log(file.path)
+  await Employee.update({image: file.path}, {where:{id}});
+  ctx.status =200
+  ctx.body = {
+    message: "Image updated Successfully",
+    fileInfo: {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      path: file.path,
+      size: file.size,
+    },
+  }
+};
 
 //TO ADD PREFERENCE
 const addPreference = async (ctx) =>{
@@ -125,7 +266,7 @@ const addEducation = async (ctx) =>{
 
 //TO ADD EXPERIENCE
 const addExperience = async (ctx) =>{
-  const { empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
+  const { skills, title, empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -147,7 +288,7 @@ const addExperience = async (ctx) =>{
       console.log("You can Only add experience once");
       return;
     }
-    if(!empType || !country || !status || !description || !startDate || !compName || !endDate )
+    if(!empType || !country || !status || !description || !startDate || !compName || !endDate || !title || !skills)
       {
         ctx.status = 400;
         ctx.body = {
@@ -155,7 +296,7 @@ const addExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.create({empType, compName, country, status, description , startDate, endDate , employeeId: id})
+  await empExperience.create({empType, compName, country, status, description , startDate, endDate , employeeId: id, skills, title})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -286,7 +427,7 @@ const updateEducation = async (ctx) =>{
 
 //TO UPDATE EXPERIENCE
 const updateExperience = async (ctx) =>{
-  const { empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
+  const { skills, title, empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -308,7 +449,7 @@ const updateExperience = async (ctx) =>{
       console.log("experience not found");
       return;
     }
-    if(!empType || !country || !status || !description || !startDate || !compName || !endDate )
+    if(!empType || !country || !status || !description || !startDate || !compName || !endDate || !title || !skills)
       {
         ctx.status = 400;
         ctx.body = {
@@ -316,7 +457,7 @@ const updateExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.update({empType, compName, country, status, description , startDate, endDate},{ where: {employeeId: id}})
+  await empExperience.update({empType, compName, country, status, description , startDate, endDate, title, skills},{ where: {employeeId: id}})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -451,4 +592,4 @@ const getExperience = async (ctx) =>{
   }
 }
 
-export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience}
+export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience, addImg, dltImg, updateImg}

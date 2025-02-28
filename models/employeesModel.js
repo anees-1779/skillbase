@@ -1,3 +1,4 @@
+import { type } from 'os';
 import { sequelize } from '../config/database.js';
 import { DataTypes } from 'sequelize';
 
@@ -31,6 +32,9 @@ const Employee = sequelize.define('Employee', {
     type: DataTypes.BIGINT,
     allowNull: false,
   },
+  image:{
+    type: DataTypes.STRING(255)
+  }
 }, {
   tableName: 'Employee',
   timestamps: true,

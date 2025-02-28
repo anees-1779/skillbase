@@ -23,7 +23,7 @@ const Job = sequelize.define('Job', {
   type: {
     type: DataTypes.TEXT,
     allowNull: true,
-    unique: true,
+    unique: false
   },
   benefits: {
     type: DataTypes.JSONB,

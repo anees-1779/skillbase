@@ -3,9 +3,9 @@ import { registerEmployee, message, login } from "../controllers/authController.
 
 const authRouter = new Router();
 
-authRouter.post('/register', registerEmployee);
+authRouter.post('/employee/register', registerEmployee);
 
-authRouter.post('/login', login);
+authRouter.post('/employee/login', login);
 authRouter.get('/', message)
 
 export { authRouter }

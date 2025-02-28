@@ -16,10 +16,13 @@
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.4",
     "koa-bodyparser": "^4.4.1",
+    "koa-multer": "^1.0.2",
     "koa-router": "^13.0.1",
     "node": "^18.20.7",
+    "path": "^0.12.7",
     "pg": "^8.13.3",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "yup": "^1.6.1"
   }
 }

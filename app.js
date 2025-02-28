@@ -9,9 +9,13 @@ import { empExperience } from "./models/empExperienceModel.js";
 import { empEducation } from "./models/empEducation.js";
 import { Company } from "./models/company/companyModel.js";
 import { Job } from "./models/company/jobModel.js";
+import { CompanyLink } from "./models/company/compLinksmodel.js";
 import { authRouter } from "./routes/authRoute.js";
 import koaCors from "@koa/cors";
 import { empRouter } from "./routes/empRoute.js";
+import { recruiterAuthRouter } from "./routes/recruiter/recruiterAuthRoute.js";
+import { recruiterRouter } from "./routes/recruiter/recruiterRoute.js";
+import { jobRouter } from "./routes/recruiter/job/jobRoute.js";
 dotenv.config(); // Load environment variables at the top
 
 const app = new Koa();
@@ -20,7 +24,10 @@ const app = new Koa();
 app.use(koaCors());
 app.use(bodyParser());
 app.use(authRouter.routes()).use(authRouter.allowedMethods());
-app.use(empRouter.routes()).use(empRouter.allowedMethods())
+app.use(empRouter.routes()).use(empRouter.allowedMethods());
+app.use(recruiterAuthRouter.routes()).use(recruiterAuthRouter.allowedMethods());
+app.use(recruiterRouter.routes()).use(recruiterRouter.allowedMethods());
+app.use(jobRouter.routes()).use(jobRouter.allowedMethods());
 const startServer = async () => {
   try {
     await sequelize.authenticate();

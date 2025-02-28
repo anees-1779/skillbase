@@ -1,6 +1,7 @@
 import { sequelize } from '../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
+import { type } from 'os';
 
 const empExperience = sequelize.define('empExperience', {
   id: {
@@ -16,6 +17,14 @@ const empExperience = sequelize.define('empExperience', {
       model: Employee, // Reference to Employee model
       key: 'id',
     },
+  },
+  title:{
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  skills:{
+    type: DataTypes.JSONB,
+    allowNull: false
   },
   empType: {
     type: DataTypes.STRING(40),
