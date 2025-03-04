@@ -1,8 +1,9 @@
-import { sequelize } from '../config/database.js';
+import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
+import { type } from 'os';
 
-const empPreference = sequelize.define('empPreference', {
+const empExperience = sequelize.define('empExperience', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -17,50 +18,53 @@ const empPreference = sequelize.define('empPreference', {
       key: 'id',
     },
   },
-  typeOfJob: {
+  title:{
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  skills:{
+    type: DataTypes.JSONB,
+    allowNull: false
+  },
+  empType: {
+    type: DataTypes.STRING(40),
+    allowNull: false,
+  },
+  compName: {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  role: {
-    type: DataTypes.STRING(255),
+  country: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  skills: {
-    type: DataTypes.JSONB,
-    allowNull: false,
+  startDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
-  experienceLevel: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
+  endDate: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
-  jobSearchStatus: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-  },
-  workAuthorization: {
-    type: DataTypes.JSONB,
-    allowNull: false ,
-  },
-  expectedSalary: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  equityPreference: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
 }, {
-  tableName: 'empPreference',
+  tableName: 'EmpExperience',
   timestamps: true,
-  paranoid: true,
 });
 
-Employee.hasOne(empPreference, {
+Employee.hasOne(empExperience, {
   foreignKey: 'employeeId', 
   onDelete: 'CASCADE', 
 });
-empPreference.belongsTo(Employee, {
+empExperience.belongsTo(Employee, {
   foreignKey: 'employeeId', 
 });
 
-export { empPreference };
+export { empExperience };

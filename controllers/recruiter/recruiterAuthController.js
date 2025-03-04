@@ -1,8 +1,8 @@
-import { Employee } from '../../models/EmployeesModel.js';
+import { Employee } from '../../models/applicants/employeesModel.js';
 import { generateToken } from '../../lib/jwtVerification.js';
 import { checkPassword, hashedPassword } from '../../lib/hashPassword.js';
-import { Company } from '../../models/company/companyModel.js';
-import { CompanyLink } from '../../models/company/compLinksmodel.js';
+import { Company } from '../../models/recruiter/companyModel.js';
+import { CompanyLink } from '../../models/recruiter/compLinksmodel.js';
 
 
 

@@ -43,7 +43,7 @@ const Job = sequelize.define('Job', {
 }, {
   tableName: 'Job',
   timestamps: true,
-  paranoid: true,
+
 });
 
 // Establishing the one-to-many relationship

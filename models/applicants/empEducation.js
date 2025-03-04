@@ -1,9 +1,8 @@
-import { sequelize } from '../config/database.js';
+import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
-import { type } from 'os';
 
-const empExperience = sequelize.define('empExperience', {
+const empEducation = sequelize.define('empEducation ', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -18,54 +17,45 @@ const empExperience = sequelize.define('empExperience', {
       key: 'id',
     },
   },
-  title:{
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  skills:{
-    type: DataTypes.JSONB,
-    allowNull: false
-  },
-  empType: {
-    type: DataTypes.STRING(40),
-    allowNull: false,
-  },
-  compName: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-  },
-  country: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-  },
-  startDate: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  endDate: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
   description: {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  school: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+  },
+  degree: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+  },
+  feildOfStudy: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  GPA: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  startyear: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  endYear: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
-  tableName: 'empExperience',
+  tableName: 'EmpEducation ',
   timestamps: true,
-  paranoid: true,
 });
 
-Employee.hasOne(empExperience, {
+Employee.hasOne(empEducation , {
   foreignKey: 'employeeId', 
   onDelete: 'CASCADE', 
 });
-empExperience.belongsTo(Employee, {
+empEducation .belongsTo(Employee, {
   foreignKey: 'employeeId', 
 });
 
-export { empExperience };
+export { empEducation  };

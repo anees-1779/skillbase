@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { registerEmployee, message, login } from "../controllers/authController.js";
+import { registerEmployee, message, login } from "../../controllers/applicant/authController.js";
 
 const authRouter = new Router();
 

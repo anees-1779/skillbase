@@ -22,13 +22,6 @@ const sequelize = new Sequelize(
   }
 );
 
-// Test the database connection
-sequelize.authenticate()
-  .then(() => {
-    console.log('Database connection established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
 
 export { sequelize, JWT_SECRECT };
+

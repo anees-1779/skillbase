@@ -1,8 +1,8 @@
-import { sequelize } from '../config/database.js';
+import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
 
-const empEducation = sequelize.define('empEducation ', {
+const empPreference = sequelize.define('empPreference', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -17,46 +17,50 @@ const empEducation = sequelize.define('empEducation ', {
       key: 'id',
     },
   },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  school: {
+  typeOfJob: {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  degree: {
+  role: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+  },
+  skills: {
+    type: DataTypes.JSONB,
+    allowNull: false,
+  },
+  experienceLevel: {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  feildOfStudy: {
-    type: DataTypes.STRING,
+  jobSearchStatus: {
+    type: DataTypes.BOOLEAN,
     allowNull: false,
   },
-  GPA: {
-    type: DataTypes.FLOAT,
-    allowNull: true,
+  workAuthorization: {
+    type: DataTypes.JSONB,
+    allowNull: false ,
   },
-  startyear: {
-    type: DataTypes.DATE,
-    allowNull: true,
+  expectedSalary: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
   },
-  endYear: {
-    type: DataTypes.DATE,
-    allowNull: true,
+  equityPreference: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
   },
 }, {
-  tableName: 'empEducation ',
+  tableName: 'EmpPreference',
   timestamps: true,
-  paranoid: true,
+
 });
 
-Employee.hasOne(empEducation , {
+Employee.hasOne(empPreference, {
   foreignKey: 'employeeId', 
   onDelete: 'CASCADE', 
 });
-empEducation .belongsTo(Employee, {
+empPreference.belongsTo(Employee, {
   foreignKey: 'employeeId', 
 });
 
-export { empEducation  };
+export { empPreference };

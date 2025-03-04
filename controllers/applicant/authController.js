@@ -1,6 +1,6 @@
-import { Employee } from '../models/EmployeesModel.js';
-import { generateToken } from '../lib/jwtVerification.js';
-import { checkPassword, hashedPassword } from '../lib/hashPassword.js';
+import { Employee } from '../../models/applicants/employeesModel.js';
+import { generateToken } from '../../lib/jwtVerification.js';
+import { checkPassword, hashedPassword } from '../../lib/hashPassword.js';
 
 // Check if the user exists by username
 const checkUser = async (username) => await Employee.findOne({ where: { username } });

@@ -1,11 +1,14 @@
 import fs from 'fs';
 
-import { verifyToken } from "../lib/jwtVerification.js";
-import { empEducation } from "../models/empEducation.js";
-import { empExperience } from "../models/empExperienceModel.js";
-import { Employee } from "../models/EmployeesModel.js";
-import { employeesOverview } from "../models/employeesOverviewModel.js";
-import { empPreference } from "../models/empPreferenceModel.js";
+import { verifyToken } from "../../lib/jwtVerification.js";
+import { empEducation } from "../../models/applicants/empEducation.js";
+import { empExperience } from "../../models/applicants/empExperienceModel.js";
+import { Employee } from "../../models/applicants/employeesModel.js";
+import { employeesOverview } from "../../models/applicants/employeesOverviewModel.js";
+import { empPreference } from "../../models/applicants/empPreferenceModel.js";
+import { JobApplication } from '../../models/applicants/jobApplication.js';
+import { Company } from '../../models/recruiter/companyModel.js';
+import { Job } from '../../models/recruiter/jobModel.js';
 
 //TO ADD OVERVIEW
 const addOverview = async (ctx) =>{
@@ -56,6 +59,14 @@ const addImg = async (ctx) =>{
     ctx.body = {
       message: "Login session expired"
     }
+    fs.unlink(file.path, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err); // Log the error for debugging
+        ctx.status = 500;
+        ctx.body = { error: 'Failed to delete the image' };
+        return;
+      }
+    });
     return;
   }
   if(!file)
@@ -64,6 +75,15 @@ const addImg = async (ctx) =>{
     ctx.body = {
       message: "Please upload image"
     }
+    fs.unlink(file.path, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err); // Log the error for debugging
+        ctx.status = 500;
+        ctx.body = { error: 'Failed to delete the image' };
+        return;
+      }
+    });
+    
     return;
   }
   const emp = await Employee.findOne({where: {id}});
@@ -592,4 +612,78 @@ const getExperience = async (ctx) =>{
   }
 }
 
-export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience, addImg, dltImg, updateImg}
+//TO APPLY JOBS
+const applyJob = async (ctx) => {
+  const  cv  = ctx.req.file;  
+  const { jid } = ctx.params;
+  const id = verifyToken(ctx);
+  // Check if user is authenticated
+  if (!id) {
+    ctx.status = 400;
+    ctx.body = {
+      message: "Login session expired"
+    };
+    fs.unlink(cv.path, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err); // Log the error for debugging
+        ctx.status = 500;
+        ctx.body = { error: 'Failed to delete the image' };
+        return;
+      }
+    });
+    return;
+  }
+  if (!cv) {
+    ctx.status = 400;
+    ctx.body = {
+      message: "All details are required"
+    };
+    return;
+  }
+  const job = await Job.findOne({where: {id:jid}})
+  const employee = await Employee.findOne({where: {id}});
+  const checkStatus = await JobApplication.findOne({where:{jobId: jid, userId: id}});
+  if(checkStatus)
+  {
+    ctx.status = 400;
+    ctx.body = {
+      message: "You already applied to this job"
+    }
+    console.log("You already applied for this jobs")
+    fs.unlink(cv.path, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err); // Log the error for debugging
+        ctx.status = 500;
+        ctx.body = { error: 'Failed to delete file' };
+        return;
+      }
+    });
+    return;
+  }
+  try {
+    const jobApply = await JobApplication.create({
+      name: employee.name,
+      contact: employee.contact,
+      email: employee.email,  
+      CV: cv.path ,
+      jobId:jid,
+      userId: id,
+      companyId: job.companyId
+    });
+    
+    ctx.status = 200;
+    ctx.body = {
+      message: "Job applied successfully",
+      jobApply
+    };
+    console.log(`${employee.name} applied for this job successfully`)
+  } catch (error) {
+    console.error("Error applying for job:", error);
+    ctx.status = 500;
+    ctx.body = {
+      message: "An error occurred while applying for the job"
+    };
+  }
+};
+
+export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience, addImg, dltImg, updateImg, applyJob}

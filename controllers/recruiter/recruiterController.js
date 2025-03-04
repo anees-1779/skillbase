@@ -1,8 +1,8 @@
 import { verifyToken } from "../../lib/jwtVerification.js";
-import { Company } from "../../models/company/companyModel.js";
+import { Company } from "../../models/recruiter/companyModel.js";
 
 const addDetails = async (ctx) =>{
-  const { No_0f_Emp, description, No_of_Jobs,  techStack, foundedIn , CEO} = ctx.request.body;
+  const { No_of_Emp, description, No_of_Jobs,  techStack, foundedIn , CEO} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
   if(!id)
@@ -13,8 +13,8 @@ const addDetails = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await Company.findOne({where: { id}});
-  if(checkOverview.No_0f_Emp)
+  const checkDetails = await Company.findOne({where: { id}});
+  if(checkDetails.No_of_Emp)
   {
     ctx.status = 400;
     ctx.body = {
@@ -23,7 +23,7 @@ const addDetails = async (ctx) =>{
     console.log("You can Only add detail once");
     return;
   }
-  if(!No_0f_Emp || !description || !No_of_Jobs || !techStack || !foundedIn || !CEO)
+  if(!No_of_Emp || !description || !No_of_Jobs || !techStack || !foundedIn || !CEO)
   {
     ctx.status = 400;
     ctx.body = {
@@ -31,7 +31,7 @@ const addDetails = async (ctx) =>{
     }
     return;
   }
-  await Company.update({ No_0f_Emp, description, No_of_Jobs, techStack, foundedIn, CEO }, {where: {id}})
+  await Company.update({ No_of_Emp, description, No_of_Jobs, techStack, foundedIn, CEO }, {where: {id}})
   console.log("Details Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -39,4 +39,42 @@ const addDetails = async (ctx) =>{
   }
 }
 
-export {addDetails}
+const updateDetails = async (ctx) =>{
+  const { No_of_Emp, description, No_of_Jobs,  techStack, foundedIn , CEO} = ctx.request.body;
+  const decoded = verifyToken(ctx);
+  const id = decoded
+  if(!id)
+  {
+    ctx.status = 400;
+    ctx.body = {
+      message: "Token not found"
+    }
+    return;
+  }
+  const checkDetails = await Company.findOne({where: { id}});
+  if(!checkDetails)
+  {
+    ctx.status = 400;
+    ctx.body = {
+      message: "No details found"
+    }
+    console.log("No details found");
+    return;
+  }
+  if(!No_of_Emp || !description || !No_of_Jobs || !techStack || !foundedIn || !CEO)
+  {
+    ctx.status = 400;
+    ctx.body = {
+      message: "Please enter all the details"
+    }
+    return;
+  }
+  await Company.update({ No_of_Emp, description, No_of_Jobs, techStack, foundedIn, CEO }, {where: {id}})
+  console.log("Details updated Successfully")
+  ctx.status = 200;
+  ctx.body = {
+    message:"Details updated successfully"
+  }
+}
+
+export {addDetails, updateDetails}

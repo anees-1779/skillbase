@@ -51,7 +51,7 @@ const Company = sequelize.define('Company', {
 }, {
   tableName: 'Company',
   timestamps: true,
-  paranoid: true, 
+
 });
 
 export { Company };

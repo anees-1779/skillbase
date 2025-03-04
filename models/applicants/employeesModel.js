@@ -1,5 +1,4 @@
-import { type } from 'os';
-import { sequelize } from '../config/database.js';
+import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 
 // Define the Employee model
@@ -38,7 +37,6 @@ const Employee = sequelize.define('Employee', {
 }, {
   tableName: 'Employee',
   timestamps: true,
-  paranoid: true, 
 });
 
 export { Employee };

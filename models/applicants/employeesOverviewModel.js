@@ -1,4 +1,4 @@
-import { sequelize } from '../config/database.js';
+import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
 
@@ -46,9 +46,8 @@ const employeesOverview = sequelize.define('employeesOverview', {
     allowNull: true,
   },
 }, {
-  tableName: 'employeesOverview',
+  tableName: 'EmployeesOverview',
   timestamps: true,
-  paranoid: true,
 });
 
 Employee.hasOne(employeesOverview, {
