@@ -52,7 +52,7 @@ const JobApplication = sequelize.define('JobApplication', {
     allowNull: false,
   },
   status: {  // New field for application status
-    type: DataTypes.ENUM('Pending', 'Shortlisted', 'Rejected', 'Interview Scheduled'),
+    type: DataTypes.ENUM('Pending', 'Shortlisted', 'Rejected'),
     defaultValue: 'Pending',
   },
   interviewDate: { // Date for scheduled interviews

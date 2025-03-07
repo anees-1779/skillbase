@@ -14,9 +14,9 @@ import { JobApplication } from "./models/applicants/jobApplication.js";
 import { authRouter } from "./routes/applicant/authRoute.js";
 import koaCors from "@koa/cors";
 import { empRouter } from "./routes/applicant/empRoute.js";
-import { recruiterAuthRouter } from "./routes/recruiter/recruiterAuthRoute.js";
-import { recruiterRouter } from "./routes/recruiter/recruiterRoute.js";
 import { jobRouter } from "./routes/recruiter/job/jobRoute.js";
+import { recruiterAuthRouter } from "./routes/recruiter/auth/recruiterAuthRoute.js";
+import { recruiterRouter } from "./routes/recruiter/auth/recruiterRoute.js";
 dotenv.config(); // Load environment variables at the top
 
 const app = new Koa();

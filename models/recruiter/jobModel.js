@@ -1,6 +1,6 @@
 import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
-import { Company } from './companyModel.js'; // Adjust the path according to your structure
+import { Company } from './companyModel.js'; 
 
 const Job = sequelize.define('Job', {
   id: {
@@ -33,6 +33,10 @@ const Job = sequelize.define('Job', {
     type: DataTypes.JSONB,
     allowNull: true,
   },
+  applicantCount:{
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    },
   companyId: {  // Foreign key for the relation
     type: DataTypes.UUID,
     references: {

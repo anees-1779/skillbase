@@ -643,6 +643,7 @@ const applyJob = async (ctx) => {
   const job = await Job.findOne({where: {id:jid}})
   const employee = await Employee.findOne({where: {id}});
   const checkStatus = await JobApplication.findOne({where:{jobId: jid, userId: id}});
+  console.log(job)
   if(checkStatus)
   {
     ctx.status = 400;
@@ -670,7 +671,10 @@ const applyJob = async (ctx) => {
       userId: id,
       companyId: job.companyId
     });
-    
+    await Job.increment('applicantCount', {
+      by: 1, 
+      where: { id: jid }
+    });
     ctx.status = 200;
     ctx.body = {
       message: "Job applied successfully",

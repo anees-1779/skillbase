@@ -3,7 +3,7 @@ import { verifyToken } from '../../../lib/jwtVerification.js';
 import { Company } from '../../../models/recruiter/companyModel.js';
 import { Job } from '../../../models/recruiter/jobModel.js';
 import { JobApplication } from '../../../models/applicants/jobApplication.js';
-import { message } from '../recruiterAuthController.js';
+import { rejectApplicantMail, selectApplicantMail } from '../../../lib/otpMail.js';
 
 // Validation schema using Yup
 const jobSchema = Yup.object().shape({
@@ -159,6 +159,7 @@ const viewApplication = async (ctx) =>{
     return;
   }
    const applied = await JobApplication.findAll({where: {companyId: id}})
+   const count = await JobApplication.count({where: {companyId: id}})
    console.log(applied)
    if(!applied )
    {
@@ -171,8 +172,39 @@ const viewApplication = async (ctx) =>{
    ctx.status = 200;
    ctx.body ={
     message: "Applied Users",
-    applied
+    applied,
+    count: count
    }
+}
+
+//TO VIEW ALL THE JOBS POSTED
+const viewJobs = async (ctx) =>{
+  const id = verifyToken(ctx);
+  if(!id)
+  {
+    ctx.status = 403;
+    ctx.body = {
+      message: "Login session expired"
+    }
+    return;
+  }
+  const jobs = await Job.findAll({
+    where: { companyId: id }});
+  
+  if(!jobs)
+  {
+    ctx.status = 404;
+    ctx.body = {
+      message: "No Jobs posted yet"
+    }
+    return;
+  }
+
+  ctx.status = 200;
+  ctx.body = {
+    jobs
+  };
+  console.log("jobs sent successfully")
 }
 
 //TO SHORTLIST APPLICANT
@@ -183,6 +215,7 @@ const shortListApplication = async (ctx) =>{
   const {jobApplicantsId} = ctx.params;
   console.log(jobApplicantsId)
   const application = await JobApplication.findByPk(jobApplicantsId);
+  const company = await Company.findByPk(application.companyId)
 
   const job = await Job.findOne({where: {id: application.jobId}})
   if(!id){
@@ -190,6 +223,7 @@ const shortListApplication = async (ctx) =>{
     ctx.body = {
       message: "Login session expired"
     }
+    return;
   }
   if(!interviewDate)
   {
@@ -218,6 +252,7 @@ const shortListApplication = async (ctx) =>{
   application.interviewDate = interviewDate
   application.interviewLink = interviewLink
   application.save();
+  selectApplicantMail(application.email, application.status, application.interviewDate, application.interviewLink, company.name )
   console.log(application);
   ctx.status = 200
   ctx.body = {
@@ -233,5 +268,105 @@ const shortListApplication = async (ctx) =>{
  }
 }
 
+//TO RESCHEDULE INTERVIEW
+const rescheduleInterview = async (ctx) =>{
+  const id = verifyToken(ctx);
+  const {jobApplicantsId} = ctx.params
+  const { rescheduledDate } = ctx.request.body 
+  if(!id)
+  {
+    ctx.status = 403; 
+    ctx.body = {
+      message: " Login session expired"
+    }
+    return;
+  }
+  if(!rescheduledDate){
+    ctx.status = 400;
+    ctx.body = {
+      message: "Please enter the rescheduled Date"
+    }
+    console.log("Please enter the rescheduled Date")
+    return;
+  }
+  const applicant = await JobApplication.findOne({where: {id: jobApplicantsId}})
+  console.log(applicant)
+  if(!applicant)
+  {
+    ctx.status = 404;
+    ctx.body = {
+      message: "Application not found"
+    }
+    console.log("Application not found")
+    return;
+  }
+  if(applicant.status != 'Shortlisted'){
+    ctx.status = 400;
+    ctx.body = {
+      message: "This resume has not been shortlisted"
+    }
+    console.log("This resume has not been shortlisted")
+    return;
+  }
+  applicant.interviewDate = rescheduledDate;
+  await applicant.save();
+  ctx.status = 200;
+  ctx.body = {
+    message: "Interview date changed successfully",
+    newDate: rescheduledDate
+  }
+  console.log("Interview date changed successfully")
+}
 
-export { addJob, updateJob, deleteJob, viewApplication, shortListApplication};
+//TO REJECT APPLICATION
+const rejectApplication = async (ctx) =>{
+  try{ 
+   const id = verifyToken(ctx); 
+   const {jobApplicantsId} = ctx.params;
+   console.log(jobApplicantsId)
+   const application = await JobApplication.findByPk(jobApplicantsId);
+   const company = await Company.findByPk(application.companyId)
+ 
+   const job = await Job.findOne({where: {id: application.jobId}})
+   if(!id){
+     ctx.status = 400;
+     ctx.body = {
+       message: "Login session expired"
+     }
+     return;
+   }
+   if(!job)
+   {
+     ctx.status = 404;
+     ctx.body = {
+       message: "Job not found"
+     }
+     return
+   }
+   if(!application)
+    {
+      ctx.status = 404;
+      ctx.body = {
+        message: "Job application not found"
+      }
+      return;
+    }
+   application.status = "Rejected"
+   await application.save();
+   rejectApplicantMail(application.email, application.status, company.name )
+   console.log(application);
+   ctx.status = 200
+   ctx.body = {
+     message: "Applicant rejected successfully"
+   }
+  }
+  catch(error){
+   ctx.status = 500;
+       ctx.body = {
+         message: 'Error creating job',
+         error: error.message,
+       };
+  }
+ }
+
+export { addJob, updateJob, deleteJob, viewApplication, shortListApplication, rejectApplication, viewJobs, rescheduleInterview};
