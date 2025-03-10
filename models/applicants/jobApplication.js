@@ -66,6 +66,7 @@ const JobApplication = sequelize.define('JobApplication', {
 }, {
   tableName: 'JobApplications', // Renamed to match best practices
   timestamps: true,
+  underscored: true
 });
 
 // Define associations

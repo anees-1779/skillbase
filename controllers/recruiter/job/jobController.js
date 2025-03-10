@@ -159,7 +159,7 @@ const viewApplication = async (ctx) =>{
     return;
   }
    const applied = await JobApplication.findAll({where: {companyId: id}})
-   const count = await JobApplication.count({where: {companyId: id}})
+   const count = await JobApplication.count({where: {company_id: id}})
    console.log(applied)
    if(!applied )
    {
@@ -189,7 +189,7 @@ const viewJobs = async (ctx) =>{
     return;
   }
   const jobs = await Job.findAll({
-    where: { companyId: id }});
+    where: { company_id: id }});
   
   if(!jobs)
   {
@@ -211,13 +211,13 @@ const viewJobs = async (ctx) =>{
 const shortListApplication = async (ctx) =>{
  try{ 
   const id = verifyToken(ctx);
-  const { interviewDate, interviewLink } = ctx.request.body 
+  const { interview_date, interview_link } = ctx.request.body 
   const {jobApplicantsId} = ctx.params;
   console.log(jobApplicantsId)
   const application = await JobApplication.findByPk(jobApplicantsId);
-  const company = await Company.findByPk(application.companyId)
+  const company = await Company.findByPk(application.company_id)
 
-  const job = await Job.findOne({where: {id: application.jobId}})
+  const job = await Job.findOne({where: {id: application.job_id}})
   if(!id){
     ctx.status = 400;
     ctx.body = {
@@ -225,7 +225,7 @@ const shortListApplication = async (ctx) =>{
     }
     return;
   }
-  if(!interviewDate)
+  if(!interview_date)
   {
     ctx.status = 400;
     ctx.body = {
@@ -249,10 +249,10 @@ const shortListApplication = async (ctx) =>{
     return
   }
   application.status = "Shortlisted"
-  application.interviewDate = interviewDate
-  application.interviewLink = interviewLink
+  application.interviewDate = interview_date
+  application.interviewLink = interview_link
   application.save();
-  selectApplicantMail(application.email, application.status, application.interviewDate, application.interviewLink, company.name )
+  selectApplicantMail(application.email, application.status, application.interview_date, application.interview_link, company.name )
   console.log(application);
   ctx.status = 200
   ctx.body = {
@@ -272,7 +272,7 @@ const shortListApplication = async (ctx) =>{
 const rescheduleInterview = async (ctx) =>{
   const id = verifyToken(ctx);
   const {jobApplicantsId} = ctx.params
-  const { rescheduledDate } = ctx.request.body 
+  const { rescheduled_date } = ctx.request.body 
   if(!id)
   {
     ctx.status = 403; 
@@ -281,7 +281,7 @@ const rescheduleInterview = async (ctx) =>{
     }
     return;
   }
-  if(!rescheduledDate){
+  if(!rescheduled_date){
     ctx.status = 400;
     ctx.body = {
       message: "Please enter the rescheduled Date"
@@ -308,12 +308,12 @@ const rescheduleInterview = async (ctx) =>{
     console.log("This resume has not been shortlisted")
     return;
   }
-  applicant.interviewDate = rescheduledDate;
+  applicant.interview_date = rescheduled_date;
   await applicant.save();
   ctx.status = 200;
   ctx.body = {
     message: "Interview date changed successfully",
-    newDate: rescheduledDate
+    newDate: rescheduled_date
   }
   console.log("Interview date changed successfully")
 }
@@ -325,9 +325,9 @@ const rejectApplication = async (ctx) =>{
    const {jobApplicantsId} = ctx.params;
    console.log(jobApplicantsId)
    const application = await JobApplication.findByPk(jobApplicantsId);
-   const company = await Company.findByPk(application.companyId)
+   const company = await Company.findByPk(application.company_id)
  
-   const job = await Job.findOne({where: {id: application.jobId}})
+   const job = await Job.findOne({where: {id: application.job_id}})
    if(!id){
      ctx.status = 400;
      ctx.body = {

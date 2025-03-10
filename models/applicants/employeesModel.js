@@ -37,6 +37,7 @@ const Employee = sequelize.define('Employee', {
 }, {
   tableName: 'Employee',
   timestamps: true,
+  underscored: true
 });
 
 export { Employee };

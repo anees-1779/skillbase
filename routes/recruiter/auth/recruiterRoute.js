@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { addDetails, updateDetails } from "../../../controllers/recruiter/recruiterController.js";
+import { addDetails, updateDetails } from "../../../controllers/recruiter/details/recruiterController.js";
 
 const recruiterRouter = new Router();
 

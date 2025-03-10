@@ -48,6 +48,7 @@ const CompanyLink = sequelize.define("CompanyLink", {
   },
 }, {
   timestamps: true,
+  underscored: true
 });
 
 Company.hasOne(CompanyLink, { foreignKey: "companyId" });

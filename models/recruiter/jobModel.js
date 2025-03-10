@@ -1,6 +1,7 @@
 import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Company } from './companyModel.js'; 
+import { type } from 'os';
 
 const Job = sequelize.define('Job', {
   id: {
@@ -44,9 +45,13 @@ const Job = sequelize.define('Job', {
       key: 'id',
     },
   },
+  location:{
+    type: DataTypes.STRING(255)
+  }
 }, {
   tableName: 'Job',
   timestamps: true,
+  underscored: true
 
 });
 

@@ -4,7 +4,6 @@ import { registerEmployee, message, login } from "../../controllers/applicant/au
 const authRouter = new Router();
 
 authRouter.post('/employee/register', registerEmployee);
-
 authRouter.post('/employee/login', login);
 authRouter.get('/', message)
 

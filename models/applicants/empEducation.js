@@ -2,7 +2,7 @@ import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
 import { Employee } from './EmployeesModel.js';
 
-const empEducation = sequelize.define('empEducation ', {
+const empEducation = sequelize.define('applicant_education ', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -48,6 +48,7 @@ const empEducation = sequelize.define('empEducation ', {
 }, {
   tableName: 'EmpEducation ',
   timestamps: true,
+  underscored: true
 });
 
 Employee.hasOne(empEducation , {

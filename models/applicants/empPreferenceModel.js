@@ -52,6 +52,7 @@ const empPreference = sequelize.define('empPreference', {
 }, {
   tableName: 'EmpPreference',
   timestamps: true,
+  underscored: true
 
 });
 

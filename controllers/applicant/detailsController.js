@@ -1,18 +1,15 @@
 import fs from 'fs';
-
 import { verifyToken } from "../../lib/jwtVerification.js";
 import { empEducation } from "../../models/applicants/empEducation.js";
 import { empExperience } from "../../models/applicants/empExperienceModel.js";
-import { Employee } from "../../models/applicants/employeesModel.js";
+
 import { employeesOverview } from "../../models/applicants/employeesOverviewModel.js";
 import { empPreference } from "../../models/applicants/empPreferenceModel.js";
-import { JobApplication } from '../../models/applicants/jobApplication.js';
-import { Company } from '../../models/recruiter/companyModel.js';
-import { Job } from '../../models/recruiter/jobModel.js';
+import { Employee } from '../../models/applicants/EmployeesModel.js';
 
 //TO ADD OVERVIEW
 const addOverview = async (ctx) =>{
-  const { country, description, bio, visibility, github , twitter, linkedIn} = ctx.request.body;
+  const { country, description, bio, visibility, github , twitter, linked_in} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
   if(!id)
@@ -23,7 +20,7 @@ const addOverview = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await employeesOverview.findOne({where: {employeeId: id}});
+  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
   if(checkOverview)
   {
     ctx.status = 400;
@@ -41,7 +38,7 @@ const addOverview = async (ctx) =>{
     }
     return;
   }
-  await employeesOverview.create({country, description, bio, visibility, employeeId: id, github, linkedIn, twitter})
+  await employeesOverview.create({country, description, bio, visibility, employee_id: id, github, linked_in, twitter})
   console.log("OverView Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -206,7 +203,7 @@ const updateImg = async (ctx) => {
 
 //TO ADD PREFERENCE
 const addPreference = async (ctx) =>{
-  const { typeOfJob, role, skills, experienceLevel, jobSearchStatus , workAuthorization, expectedSalary, equityPreference } = ctx.request.body;
+  const { type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -218,7 +215,7 @@ const addPreference = async (ctx) =>{
         }
         return;
       }
-    const checkPref = await empPreference.findOne({where: {employeeId: id}});
+    const checkPref = await empPreference.findOne({where: {employee_id: id}});
     if(checkPref)
     {
       ctx.status = 400;
@@ -228,7 +225,7 @@ const addPreference = async (ctx) =>{
       console.log("You can Only add One preference");
       return;
     }
-    if(!typeOfJob || !skills || !experienceLevel || !jobSearchStatus || !workAuthorization || !expectedSalary || !equityPreference )
+    if(!type_of_job || !skills || !experience_level || !job_search_status || !work_authorization || !expected_salary || !equity_preference )
   {
     ctx.status = 400;
     ctx.body = {
@@ -236,7 +233,7 @@ const addPreference = async (ctx) =>{
     }
     return;
   }
-  await empPreference.create({typeOfJob, role, skills, experienceLevel, jobSearchStatus , workAuthorization, expectedSalary, equityPreference, employeeId: id})
+  await empPreference.create({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference, employee_id: id})
   console.log("Overview Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -246,7 +243,7 @@ const addPreference = async (ctx) =>{
 
 //TO ADD EDUCATION
 const addEducation = async (ctx) =>{
-  const { description, school, degree, feildOfStudy, GPA , startyear, endYear } = ctx.request.body;
+  const { description, school, degree, feild_of_study, gpa , start_year, end_year } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -258,7 +255,7 @@ const addEducation = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empEducation.findOne({where: {employeeId: id}});
+    const checkExp= await empEducation.findOne({where: {employee_id: id}});
     if(checkExp)
     {
       ctx.status = 400;
@@ -268,7 +265,7 @@ const addEducation = async (ctx) =>{
       console.log("You can Only add eduucation once");
       return;
     }
-    if(!description || !school || !degree || !feildOfStudy || !GPA || !startyear || !endYear )
+    if(!description || !school || !degree || !feild_of_study || !gpa || !start_year || !end_year )
       {
         ctx.status = 400;
         ctx.body = {
@@ -276,7 +273,7 @@ const addEducation = async (ctx) =>{
     }
     return;
   }
-  await empEducation.create({description, school, degree, feildOfStudy, GPA , startyear, endYear , employeeId: id})
+  await empEducation.create({description, school, degree, feild_of_study, gpa , start_year, end_year , employee_id: id})
   console.log("Education Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -286,7 +283,7 @@ const addEducation = async (ctx) =>{
 
 //TO ADD EXPERIENCE
 const addExperience = async (ctx) =>{
-  const { skills, title, empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
+  const { skills, title, emp_type, comp_name, country, status, description , start_date, end_date } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -298,7 +295,7 @@ const addExperience = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empExperience.findOne({where: {employeeId: id}});
+    const checkExp= await empExperience.findOne({where: {employee_id: id}});
     if(checkExp)
     {
       ctx.status = 400;
@@ -308,7 +305,7 @@ const addExperience = async (ctx) =>{
       console.log("You can Only add experience once");
       return;
     }
-    if(!empType || !country || !status || !description || !startDate || !compName || !endDate || !title || !skills)
+    if(!emp_type || !country || !status || !description || !start_date || !comp_name || !end_date || !title || !skills)
       {
         ctx.status = 400;
         ctx.body = {
@@ -316,7 +313,7 @@ const addExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.create({empType, compName, country, status, description , startDate, endDate , employeeId: id, skills, title})
+  await empExperience.create({emp_type, comp_name, country, status, description , start_date, end_date , employee_id: id, skills, title})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -326,7 +323,7 @@ const addExperience = async (ctx) =>{
 
 //TO UPDATE OVERVIEW
 const updateOverview = async (ctx) =>{
-  const { country, description, bio, visibility, github , twitter, linkedIn} = ctx.request.body;
+  const { country, description, bio, visibility, github , twitter, linked_in} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
   console.log(id)
@@ -338,7 +335,7 @@ const updateOverview = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await employeesOverview.findOne({where: {employeeId: id}});
+  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
   if(!checkOverview)
   {
     ctx.status = 404;
@@ -356,7 +353,7 @@ const updateOverview = async (ctx) =>{
     }
     return;
   }
-  await employeesOverview.update({country, description, bio, visibility, github, linkedIn, twitter}, {where :{employeeId: id}})
+  await employeesOverview.update({country, description, bio, visibility, github, linked_in, twitter}, {where :{employee_id: id}})
   console.log("overview updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -366,8 +363,8 @@ const updateOverview = async (ctx) =>{
 
 //TO UPDATE PREFERENCE
 const updatePreference = async (ctx) =>{
-  const { typeOfJob, role, skills, experienceLevel, jobSearchStatus , workAuthorization, expectedSalary, equityPreference } = ctx.request.body;
-  console.log(typeOfJob, role, skills, experienceLevel, jobSearchStatus , workAuthorization, expectedSalary, equityPreference)
+  const { type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference } = ctx.request.body;
+  console.log(type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference)
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -379,7 +376,7 @@ const updatePreference = async (ctx) =>{
         }
         return;
       }
-    const checkPref = await empPreference.findOne({where: {employeeId: id}});
+    const checkPref = await empPreference.findOne({where: {employee_id: id}});
     if(!checkPref)
     {
       ctx.status = 404;
@@ -389,7 +386,7 @@ const updatePreference = async (ctx) =>{
       console.log("preference not found");
       return;
     }
-    if(!typeOfJob || !skills || !experienceLevel || !jobSearchStatus || !workAuthorization || !expectedSalary || !equityPreference )
+    if(!type_of_job || !skills || !experience_level || !job_search_status || !work_authorization || !expected_salary || !equity_preference )
   {
     ctx.status = 400;
     ctx.body = {
@@ -397,7 +394,7 @@ const updatePreference = async (ctx) =>{
     }
     return;
   }
-  await empPreference.update({typeOfJob, role, skills, experienceLevel, jobSearchStatus , workAuthorization, expectedSalary, equityPreference }, {where: {employeeId: id}})
+  await empPreference.update({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference }, {where: {employee_id: id}})
   console.log("preference updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -407,7 +404,7 @@ const updatePreference = async (ctx) =>{
 
 //TO UPDATE EDUCATION
 const updateEducation = async (ctx) =>{
-  const { description, school, degree, feildOfStudy, GPA , startyear, endYear } = ctx.request.body;
+  const { description, school, degree, feild_of_study, gpa , start_year, end_year } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -419,7 +416,7 @@ const updateEducation = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empEducation.findOne({where: {employeeId: id}});
+    const checkExp= await empEducation.findOne({where: {employee_id: id}});
     if(!checkExp)
     {
       ctx.status = 404;
@@ -429,7 +426,7 @@ const updateEducation = async (ctx) =>{
       console.log("education not found");
       return;
     }
-    if(!description || !school || !degree || !feildOfStudy || !GPA || !startyear || !endYear )
+    if(!description || !school || !degree || !feild_of_study || !gpa || !start_year || !end_year )
       {
         ctx.status = 400;
         ctx.body = {
@@ -437,7 +434,7 @@ const updateEducation = async (ctx) =>{
     }
     return;
   }
-  await empEducation.update({description, school, degree, feildOfStudy, GPA , startyear, endYear}, { where: {employeeId: id}})
+  await empEducation.update({description, school, degree, feild_of_study, gpa , start_year, end_year}, { where: {employee_id: id}})
   console.log("Education updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -447,7 +444,7 @@ const updateEducation = async (ctx) =>{
 
 //TO UPDATE EXPERIENCE
 const updateExperience = async (ctx) =>{
-  const { skills, title, empType, compName, country, status, description , startDate, endDate } = ctx.request.body;
+  const { skills, title, emp_type, comp_name, country, status, description , start_date, end_date } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -459,7 +456,7 @@ const updateExperience = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empExperience.findOne({where: {employeeId: id}});
+    const checkExp= await empExperience.findOne({where: {employee_id: id}});
     if(!checkExp)
     {
       ctx.status = 404;
@@ -469,7 +466,7 @@ const updateExperience = async (ctx) =>{
       console.log("experience not found");
       return;
     }
-    if(!empType || !country || !status || !description || !startDate || !compName || !endDate || !title || !skills)
+    if(!emp_type || !country || !status || !description || !start_date || !comp_name || !end_date || !title || !skills)
       {
         ctx.status = 400;
         ctx.body = {
@@ -477,7 +474,7 @@ const updateExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.update({empType, compName, country, status, description , startDate, endDate, title, skills},{ where: {employeeId: id}})
+  await empExperience.update({emp_type, comp_name, country, status, description , start_date, end_date, title, skills},{ where: {employee_id: id}})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -498,7 +495,7 @@ const getOverview = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await employeesOverview.findOne({where: {employeeId: id}});
+  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
   if(!checkOverview)
   {
     ctx.status = 404;
@@ -530,7 +527,7 @@ const getPreference = async (ctx) =>{
     return;
   }
   const checkPreference = await empPreference
-  .findOne({where: {employeeId: id}});
+  .findOne({where: {employee_id: id}});
   if(!checkPreference)
   {
     ctx.status = 404;
@@ -562,7 +559,7 @@ const getEducation = async (ctx) =>{
     return;
   }
   const checkEdu = await empEducation
-  .findOne({where: {employeeId: id}});
+  .findOne({where: {employee_id: id}});
   if(!checkEdu)
   {
     ctx.status = 404;
@@ -594,7 +591,7 @@ const getExperience = async (ctx) =>{
     return;
   }
   const checkExperience = await empExperience
-  .findOne({where: {employeeId: id}});
+  .findOne({where: {employee_id: id}});
   if(!checkExperience)
   {
     ctx.status = 404;
@@ -612,82 +609,4 @@ const getExperience = async (ctx) =>{
   }
 }
 
-//TO APPLY JOBS
-const applyJob = async (ctx) => {
-  const  cv  = ctx.req.file;  
-  const { jid } = ctx.params;
-  const id = verifyToken(ctx);
-  // Check if user is authenticated
-  if (!id) {
-    ctx.status = 400;
-    ctx.body = {
-      message: "Login session expired"
-    };
-    fs.unlink(cv.path, (err) => {
-      if (err) {
-        console.error('Error deleting file:', err); // Log the error for debugging
-        ctx.status = 500;
-        ctx.body = { error: 'Failed to delete the image' };
-        return;
-      }
-    });
-    return;
-  }
-  if (!cv) {
-    ctx.status = 400;
-    ctx.body = {
-      message: "All details are required"
-    };
-    return;
-  }
-  const job = await Job.findOne({where: {id:jid}})
-  const employee = await Employee.findOne({where: {id}});
-  const checkStatus = await JobApplication.findOne({where:{jobId: jid, userId: id}});
-  console.log(job)
-  if(checkStatus)
-  {
-    ctx.status = 400;
-    ctx.body = {
-      message: "You already applied to this job"
-    }
-    console.log("You already applied for this jobs")
-    fs.unlink(cv.path, (err) => {
-      if (err) {
-        console.error('Error deleting file:', err); // Log the error for debugging
-        ctx.status = 500;
-        ctx.body = { error: 'Failed to delete file' };
-        return;
-      }
-    });
-    return;
-  }
-  try {
-    const jobApply = await JobApplication.create({
-      name: employee.name,
-      contact: employee.contact,
-      email: employee.email,  
-      CV: cv.path ,
-      jobId:jid,
-      userId: id,
-      companyId: job.companyId
-    });
-    await Job.increment('applicantCount', {
-      by: 1, 
-      where: { id: jid }
-    });
-    ctx.status = 200;
-    ctx.body = {
-      message: "Job applied successfully",
-      jobApply
-    };
-    console.log(`${employee.name} applied for this job successfully`)
-  } catch (error) {
-    console.error("Error applying for job:", error);
-    ctx.status = 500;
-    ctx.body = {
-      message: "An error occurred while applying for the job"
-    };
-  }
-};
-
-export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience, addImg, dltImg, updateImg, applyJob}
+export {addOverview, addPreference, addEducation, addExperience, updateOverview, updatePreference, updateEducation, updateExperience, getOverview, getEducation, getPreference, getExperience, addImg, dltImg, updateImg }

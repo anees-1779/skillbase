@@ -1,6 +1,7 @@
 import Router from "koa-router";
-import { login, registerRecuiter } from "../../../controllers/recruiter/recruiterAuthController.js";
+
 import { message } from "../../../controllers/applicant/authController.js";
+import { registerRecuiter, login } from "../../../controllers/recruiter/auth/recruiterAuthController.js";
 
 
 const recruiterAuthRouter = new Router();

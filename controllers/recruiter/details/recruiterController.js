@@ -1,8 +1,8 @@
-import { verifyToken } from "../../lib/jwtVerification.js";
-import { Company } from "../../models/recruiter/companyModel.js";
+import { verifyToken } from "../../../lib/jwtVerification.js";
+import { Company } from "../../../models/recruiter/companyModel.js";
 
 const addDetails = async (ctx) =>{
-  const { No_of_Emp, description, No_of_Jobs,  techStack, foundedIn , CEO} = ctx.request.body;
+  const { no_of_emp, description, no_of_job,  tech_stack, founded_in , ceo} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
   if(!id)
@@ -14,7 +14,7 @@ const addDetails = async (ctx) =>{
     return;
   }
   const checkDetails = await Company.findOne({where: { id}});
-  if(checkDetails.No_of_Emp)
+  if(checkDetails.no_of_emp)
   {
     ctx.status = 400;
     ctx.body = {
@@ -23,7 +23,7 @@ const addDetails = async (ctx) =>{
     console.log("You can Only add detail once");
     return;
   }
-  if(!No_of_Emp || !description || !No_of_Jobs || !techStack || !foundedIn || !CEO)
+  if(!no_of_emp || !description || !no_of_job || !tech_stack || !founded_in || !ceo)
   {
     ctx.status = 400;
     ctx.body = {
@@ -31,7 +31,7 @@ const addDetails = async (ctx) =>{
     }
     return;
   }
-  await Company.update({ No_of_Emp, description, No_of_Jobs, techStack, foundedIn, CEO }, {where: {id}})
+  await Company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
   console.log("Details Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -40,7 +40,7 @@ const addDetails = async (ctx) =>{
 }
 
 const updateDetails = async (ctx) =>{
-  const { No_of_Emp, description, No_of_Jobs,  techStack, foundedIn , CEO} = ctx.request.body;
+  const { no_of_emp, description, no_of_job,  tech_stack, founded_in , ceo} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
   if(!id)
@@ -61,7 +61,7 @@ const updateDetails = async (ctx) =>{
     console.log("No details found");
     return;
   }
-  if(!No_of_Emp || !description || !No_of_Jobs || !techStack || !foundedIn || !CEO)
+  if(!no_of_emp || !description || !no_of_job || !tech_stack || !founded_in || !ceo)
   {
     ctx.status = 400;
     ctx.body = {
@@ -69,7 +69,7 @@ const updateDetails = async (ctx) =>{
     }
     return;
   }
-  await Company.update({ No_of_Emp, description, No_of_Jobs, techStack, foundedIn, CEO }, {where: {id}})
+  await Company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
   console.log("Details updated Successfully")
   ctx.status = 200;
   ctx.body = {

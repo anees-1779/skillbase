@@ -48,6 +48,7 @@ const employeesOverview = sequelize.define('employeesOverview', {
 }, {
   tableName: 'EmployeesOverview',
   timestamps: true,
+  underscored: true
 });
 
 Employee.hasOne(employeesOverview, {

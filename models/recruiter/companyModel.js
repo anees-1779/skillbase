@@ -31,7 +31,7 @@ const Company = sequelize.define('Company', {
     type: DataTypes.RANGE(DataTypes.INTEGER), // Range of integers
     allowNull: true,
   },
-  No_of_Jobs: {
+  No_of_Job: {
     type: DataTypes.INTEGER,
     allowNull: true,
     unique: true,
@@ -51,6 +51,7 @@ const Company = sequelize.define('Company', {
 }, {
   tableName: 'Company',
   timestamps: true,
+  underscored: true
 
 });
 

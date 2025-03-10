@@ -1,6 +1,6 @@
 import Router from "koa-router";
-import { addEducation, addExperience, addImg, addOverview, addPreference, applyJob, dltImg, getEducation, getExperience, getOverview, getPreference, updateEducation, updateExperience, updateImg, updateOverview, updatePreference } from "../../controllers/applicant/userController.js";
-import { uploadPdf, uploadPhoto } from "../../lib/multerProfile.js";
+import { addEducation, addExperience, addImg, addOverview, addPreference, dltImg, getEducation, getExperience, getOverview, getPreference, updateEducation, updateExperience, updateImg, updateOverview, updatePreference } from "../../controllers/applicant/detailsController.js";
+import { uploadPhoto } from "../../lib/multerProfile.js";
 
 const empRouter = new Router();
 
@@ -19,6 +19,5 @@ empRouter.get('/education', getEducation);
 empRouter.post('/img',uploadPhoto.single('file'), addImg );
 empRouter.delete('/img', dltImg);
 empRouter.put('/img',uploadPhoto.single('file'), updateImg)
-empRouter.post('/apply-job/:jid',uploadPdf.single('cv'), applyJob)
 
 export { empRouter}
