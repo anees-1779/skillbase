@@ -1,19 +1,19 @@
-import { sequelize } from '../../config/database.js';
+import { sequelize } from '../../../config/database.js';
 import { DataTypes } from 'sequelize';
-import { Employee } from './EmployeesModel.js';
+import { applicant } from './../details/applicantModel.js';
 
-const employeesOverview = sequelize.define('employeesOverview', {
+const applicantOverview = sequelize.define('applicant_overview', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
   },
-  employeeId: { // Foreign key
+  applicant_id: { // Foreign key referencing applicant table
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: Employee, // Reference to Employee model
+      model: applicant, // Reference to applicant model
       key: 'id',
     },
   },
@@ -33,7 +33,7 @@ const employeesOverview = sequelize.define('employeesOverview', {
     type: DataTypes.STRING(255),
     allowNull: false,
   },
-  linkedIn: {
+  linkedin: { // Changed to linked_in
     type: DataTypes.STRING(255),
     allowNull: true,
   },
@@ -46,17 +46,18 @@ const employeesOverview = sequelize.define('employeesOverview', {
     allowNull: true,
   },
 }, {
-  tableName: 'EmployeesOverview',
+  tableName: 'applicant_overview',
   timestamps: true,
-  underscored: true
+  underscored: true, // Converts timestamps to snake_case (created_at, updated_at)
 });
 
-Employee.hasOne(employeesOverview, {
-  foreignKey: 'employeeId', 
-  onDelete: 'CASCADE', 
+// Define relationships
+applicant.hasOne(applicantOverview, {
+  foreignKey: 'applicant_id',
+  onDelete: 'CASCADE',
 });
-employeesOverview.belongsTo(Employee, {
-  foreignKey: 'employeeId', 
+applicantOverview.belongsTo(applicant, {
+  foreignKey: 'applicant_id',
 });
 
-export { employeesOverview };
+export { applicantOverview };

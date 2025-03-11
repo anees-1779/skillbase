@@ -1,5 +1,5 @@
 import { verifyToken } from "../../../lib/jwtVerification.js";
-import { Company } from "../../../models/recruiter/companyModel.js";
+import { company } from "../../../models/recruiter/companyModel.js";
 
 const addDetails = async (ctx) =>{
   const { no_of_emp, description, no_of_job,  tech_stack, founded_in , ceo} = ctx.request.body;
@@ -13,7 +13,7 @@ const addDetails = async (ctx) =>{
     }
     return;
   }
-  const checkDetails = await Company.findOne({where: { id}});
+  const checkDetails = await company.findOne({where: { id}});
   if(checkDetails.no_of_emp)
   {
     ctx.status = 400;
@@ -31,7 +31,7 @@ const addDetails = async (ctx) =>{
     }
     return;
   }
-  await Company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
+  await company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
   console.log("Details Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -51,7 +51,7 @@ const updateDetails = async (ctx) =>{
     }
     return;
   }
-  const checkDetails = await Company.findOne({where: { id}});
+  const checkDetails = await company.findOne({where: { id}});
   if(!checkDetails)
   {
     ctx.status = 400;
@@ -69,7 +69,7 @@ const updateDetails = async (ctx) =>{
     }
     return;
   }
-  await Company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
+  await company.update({ no_of_emp, description, no_of_job, tech_stack, founded_in, ceo }, {where: {id}})
   console.log("Details updated Successfully")
   ctx.status = 200;
   ctx.body = {

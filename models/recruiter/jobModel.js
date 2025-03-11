@@ -1,9 +1,9 @@
 import { sequelize } from '../../config/database.js';
 import { DataTypes } from 'sequelize';
-import { Company } from './companyModel.js'; 
+import { company } from './companyModel.js'; 
 import { type } from 'os';
 
-const Job = sequelize.define('Job', {
+const job = sequelize.define('job', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -34,35 +34,34 @@ const Job = sequelize.define('Job', {
     type: DataTypes.JSONB,
     allowNull: true,
   },
-  applicantCount:{
+  applicant_count: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
-    },
-  companyId: {  // Foreign key for the relation
+  },
+  company_id: {  // Foreign key for the relation
     type: DataTypes.UUID,
     references: {
-      model: Company,
+      model: company,
       key: 'id',
     },
   },
-  location:{
+  location: {
     type: DataTypes.STRING(255)
   }
 }, {
-  tableName: 'Job',
+  tableName: 'job', // Changed table name to snake_case
   timestamps: true,
-  underscored: true
-
+  underscored: true // Ensures all field names use snake_case
 });
 
 // Establishing the one-to-many relationship
-Company.hasMany(Job, {
-  foreignKey: 'companyId', 
+company.hasMany(job, {
+  foreignKey: 'company_id', 
   sourceKey: 'id', 
 });
-Job.belongsTo(Company, {
-  foreignKey: 'companyId', 
+job.belongsTo(company, {
+  foreignKey: 'company_id', 
   targetKey: 'id', 
 });
 
-export { Job };
+export { job };

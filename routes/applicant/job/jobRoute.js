@@ -3,9 +3,9 @@ import { uploadPdf } from "../../../lib/multerProfile.js";
 
 import Router from "koa-router";
 
-const empJobRouter = new Router();
+const applicantJobRouter = new Router();
 
-empJobRouter.post('/apply-job/:jid',uploadPdf.single('cv'), applyJob);
-empJobRouter.get('/jobs', filterJobs)
+applicantJobRouter.post('/apply-job/:jid',uploadPdf.single('cv'), applyJob);
+applicantJobRouter.get('/jobs', filterJobs)
 
-export { empJobRouter}
+export { applicantJobRouter}

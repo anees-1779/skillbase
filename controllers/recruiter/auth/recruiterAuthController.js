@@ -1,19 +1,20 @@
 import { checkPassword, hashedPassword } from '../../../lib/hashPassword.js';
-import { Company } from '../../../models/recruiter/companyModel.js';
-import { CompanyLink } from '../../../models/recruiter/compLinksmodel.js';
+
 import { generateToken } from '../../../lib/jwtVerification.js';
+import { company } from '../../../models/recruiter/companyModel.js';
+import { companyLink } from '../../../models/recruiter/compLinksmodel.js';
 
 
 
 // Check if the email already exists
-const checkEmail = async (email) => await Company.findOne({ where: { email } });
+const checkEmail = async (email) => await company.findOne({ where: { email } });
 
 //CHECK IF THE CONTACT NUMBER ALREADY EXIST 
-const checkContact = async (contact) => await  Company.findOne({ where: { contact: contact } });
+const checkContact = async (contact) => await  company.findOne({ where: { contact: contact } });
 
 const registerRecuiter = async (ctx) => {
   const { password, email, comp_name, contact,url } = ctx.request.body;
-  console.log(password, email, comp_name, contact)
+  console.log(url,password, email, comp_name, contact)
   if(!url || !password || !email || !comp_name || !contact)
   {
     ctx.status = 400;
@@ -40,10 +41,10 @@ const registerRecuiter = async (ctx) => {
     }
     // Hash password and create the user
     const Password = await hashedPassword(password);
-    const company = await Company.create({ password: Password, email, name: comp_name, contact});
-    await CompanyLink.create({
+    const comp = await company.create({ password: Password, email, name: comp_name, contact});
+    await companyLink.create({
       comp_url: url,
-      company_id: company.id, // Ensure foreign key is passed
+      company_id: comp.id, // Ensure foreign key is passed
     });
     
     console.log(`${company.name} created successfully`)

@@ -1,8 +1,8 @@
-import { sequelize } from '../../config/database.js';
+import { sequelize } from '../../../config/database.js';
 import { DataTypes } from 'sequelize';
 
-// Define the Employee model
-const Employee = sequelize.define('Employee', {
+// Define the Applicant model
+const applicant = sequelize.define('applicant', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4, 
@@ -31,13 +31,14 @@ const Employee = sequelize.define('Employee', {
     type: DataTypes.BIGINT,
     allowNull: false,
   },
-  image:{
-    type: DataTypes.STRING(255)
+  image: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
   }
 }, {
-  tableName: 'Employee',
+  tableName: 'applicant', // Updated table name
   timestamps: true,
-  underscored: true
+  underscored: true // Converts timestamps to snake_case (created_at, updated_at)
 });
 
-export { Employee };
+export { applicant };

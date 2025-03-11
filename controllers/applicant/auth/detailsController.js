@@ -1,17 +1,18 @@
 import fs from 'fs';
-import { verifyToken } from "../../lib/jwtVerification.js";
-import { empEducation } from "../../models/applicants/empEducation.js";
-import { empExperience } from "../../models/applicants/empExperienceModel.js";
+import { verifyToken } from "../../../lib/jwtVerification.js";
+import { applicantOverview } from '../../../models/applicants/details/applicantOverviewModel.js';
+import { applicant } from '../../../models/applicants/details/applicantModel.js';
+import { applicantPreference } from '../../../models/applicants/details/applicantPreferenceModel.js';
+import { applicantExperience } from '../../../models/applicants/details/applicantExperienceModel.js';
+import { applicantEducation } from '../../../models/applicants/details/applicantEducation.js';
 
-import { employeesOverview } from "../../models/applicants/employeesOverviewModel.js";
-import { empPreference } from "../../models/applicants/empPreferenceModel.js";
-import { Employee } from '../../models/applicants/EmployeesModel.js';
 
 //TO ADD OVERVIEW
 const addOverview = async (ctx) =>{
-  const { country, description, bio, visibility, github , twitter, linked_in} = ctx.request.body;
+  const { country, description, bio, visibility, github , twitter, linkedin} = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded
+  console.log(id)
   if(!id)
   {
     ctx.status = 400;
@@ -20,7 +21,7 @@ const addOverview = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
+  const checkOverview = await applicantOverview.findOne({where: {applicant_id: id}});
   if(checkOverview)
   {
     ctx.status = 400;
@@ -38,7 +39,7 @@ const addOverview = async (ctx) =>{
     }
     return;
   }
-  await employeesOverview.create({country, description, bio, visibility, employee_id: id, github, linked_in, twitter})
+  await applicantOverview.create({country, description, bio, visibility, employee_id: id, github, linkedin, twitter, applicant_id: id})
   console.log("OverView Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -83,7 +84,7 @@ const addImg = async (ctx) =>{
     
     return;
   }
-  const emp = await Employee.findOne({where: {id}});
+  const emp = await applicant.findOne({where: {id}});
   if(emp.image)
   {
     console.log(" fileInfo", {
@@ -106,7 +107,7 @@ const addImg = async (ctx) =>{
     }
     return
   }
-  await Employee.update({ image: file.path},{where: {id} })
+  await applicant.update({ image: file.path},{where: {id} })
    ctx.status = 202;
    ctx.body = {
      message: 'File uploaded successfully',
@@ -130,7 +131,7 @@ const dltImg = async (ctx) => {
     };
     return;
   }
-  const emp = await Employee.findOne({where:{id}})
+  const emp = await applicant.findOne({where:{id}})
 
   if (!filePath) {
     ctx.status = 400;
@@ -145,7 +146,7 @@ const dltImg = async (ctx) => {
   }
 
   // Update the employee record to set image to null
-  await Employee.update({ image: null }, { where: { id } });
+  await applicant.update({ image: null }, { where: { id } });
 
   // Use fs.unlink to delete the file
   fs.unlink(filePath, (err) => {
@@ -171,7 +172,7 @@ const updateImg = async (ctx) => {
     };
     return;
   }
-  const emp = await Employee.findOne({where:{id}})
+  const emp = await applicant.findOne({where:{id}})
   const filePath = emp.image
   console.log(filePath)
   if (!filePath) {
@@ -188,7 +189,7 @@ const updateImg = async (ctx) => {
     }
   });
   console.log(file.path)
-  await Employee.update({image: file.path}, {where:{id}});
+  await applicant.update({image: file.path}, {where:{id}});
   ctx.status =200
   ctx.body = {
     message: "Image updated Successfully",
@@ -215,7 +216,7 @@ const addPreference = async (ctx) =>{
         }
         return;
       }
-    const checkPref = await empPreference.findOne({where: {employee_id: id}});
+    const checkPref = await applicantPreference.findOne({where: {applicant_id: id}});
     if(checkPref)
     {
       ctx.status = 400;
@@ -233,7 +234,7 @@ const addPreference = async (ctx) =>{
     }
     return;
   }
-  await empPreference.create({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference, employee_id: id})
+  await applicantPreference.create({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference, applicant_id: id})
   console.log("Overview Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -243,7 +244,7 @@ const addPreference = async (ctx) =>{
 
 //TO ADD EDUCATION
 const addEducation = async (ctx) =>{
-  const { description, school, degree, feild_of_study, gpa , start_year, end_year } = ctx.request.body;
+  const { description, school, degree, field_of_study, gpa , start_year, end_year } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -255,8 +256,8 @@ const addEducation = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empEducation.findOne({where: {employee_id: id}});
-    if(checkExp)
+    const checkEdu= await applicantEducation.findOne({where: {applicant_id: id}});
+    if(checkEdu)
     {
       ctx.status = 400;
       ctx.body = {
@@ -265,7 +266,7 @@ const addEducation = async (ctx) =>{
       console.log("You can Only add eduucation once");
       return;
     }
-    if(!description || !school || !degree || !feild_of_study || !gpa || !start_year || !end_year )
+    if(!description || !school || !degree || !field_of_study || !gpa || !start_year || !end_year )
       {
         ctx.status = 400;
         ctx.body = {
@@ -273,7 +274,7 @@ const addEducation = async (ctx) =>{
     }
     return;
   }
-  await empEducation.create({description, school, degree, feild_of_study, gpa , start_year, end_year , employee_id: id})
+  await applicantEducation.create({description, school, degree, field_of_study, gpa , start_year, end_year , applicant_id: id})
   console.log("Education Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -295,7 +296,7 @@ const addExperience = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empExperience.findOne({where: {employee_id: id}});
+    const checkExp= await applicantExperience.findOne({where: {applicant_id: id}});
     if(checkExp)
     {
       ctx.status = 400;
@@ -313,7 +314,7 @@ const addExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.create({emp_type, comp_name, country, status, description , start_date, end_date , employee_id: id, skills, title})
+  await applicantExperience.create({emp_type, comp_name, country, status, description , start_date, end_date , applicant_id: id, skills, title})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -335,7 +336,7 @@ const updateOverview = async (ctx) =>{
     }
     return;
   }
-  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
+  const checkOverview = await applicantOverview.findOne({where: {applicant_id: id}});
   if(!checkOverview)
   {
     ctx.status = 404;
@@ -353,7 +354,7 @@ const updateOverview = async (ctx) =>{
     }
     return;
   }
-  await employeesOverview.update({country, description, bio, visibility, github, linked_in, twitter}, {where :{employee_id: id}})
+  await applicantOverview.update({country, description, bio, visibility, github, linked_in, twitter}, {where :{applicant_id: id}})
   console.log("overview updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -376,7 +377,7 @@ const updatePreference = async (ctx) =>{
         }
         return;
       }
-    const checkPref = await empPreference.findOne({where: {employee_id: id}});
+    const checkPref = await applicantPreference.findOne({where: {applicant_id: id}});
     if(!checkPref)
     {
       ctx.status = 404;
@@ -394,7 +395,7 @@ const updatePreference = async (ctx) =>{
     }
     return;
   }
-  await empPreference.update({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference }, {where: {employee_id: id}})
+  await applicantPreference.update({type_of_job, role, skills, experience_level, job_search_status , work_authorization, expected_salary, equity_preference }, {where: {applicant_id: id}})
   console.log("preference updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -404,7 +405,7 @@ const updatePreference = async (ctx) =>{
 
 //TO UPDATE EDUCATION
 const updateEducation = async (ctx) =>{
-  const { description, school, degree, feild_of_study, gpa , start_year, end_year } = ctx.request.body;
+  const { description, school, degree, field_of_study, gpa , start_year, end_year } = ctx.request.body;
   const decoded = verifyToken(ctx);
   const id = decoded;
   console.log(id);
@@ -416,7 +417,7 @@ const updateEducation = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empEducation.findOne({where: {employee_id: id}});
+    const checkExp= await applicantEducation.findOne({where: {applicant_id: id}});
     if(!checkExp)
     {
       ctx.status = 404;
@@ -426,7 +427,7 @@ const updateEducation = async (ctx) =>{
       console.log("education not found");
       return;
     }
-    if(!description || !school || !degree || !feild_of_study || !gpa || !start_year || !end_year )
+    if(!description || !school || !degree || !field_of_study || !gpa || !start_year || !end_year )
       {
         ctx.status = 400;
         ctx.body = {
@@ -434,7 +435,7 @@ const updateEducation = async (ctx) =>{
     }
     return;
   }
-  await empEducation.update({description, school, degree, feild_of_study, gpa , start_year, end_year}, { where: {employee_id: id}})
+  await applicantEducation.update({description, school, degree, field_of_study, gpa , start_year, end_year}, { where: {applicant_id: id}})
   console.log("Education updated Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -456,7 +457,7 @@ const updateExperience = async (ctx) =>{
       }
       return;
     }
-    const checkExp= await empExperience.findOne({where: {employee_id: id}});
+    const checkExp= await applicantExperience.findOne({where: {applicant_id: id}});
     if(!checkExp)
     {
       ctx.status = 404;
@@ -474,7 +475,7 @@ const updateExperience = async (ctx) =>{
     }
     return;
   }
-  await empExperience.update({emp_type, comp_name, country, status, description , start_date, end_date, title, skills},{ where: {employee_id: id}})
+  await applicantExperience.update({emp_type, comp_name, country, status, description , start_date, end_date, title, skills},{ where: {applicant_id: id}})
   console.log("Experience Addded Successfully")
   ctx.status = 200;
   ctx.body = {
@@ -483,35 +484,48 @@ const updateExperience = async (ctx) =>{
 }
 
 //TO GET OVERVIEW
-const getOverview = async (ctx) =>{
-  const decoded = verifyToken(ctx);
-  const id = decoded
-  console.log(id)
-  if(!id)
-  {
-    ctx.status = 400;
-    ctx.body = {
-      message: "Token not found"
+const getOverview = async (ctx) => {
+  try {
+    const decoded = verifyToken(ctx); 
+    const id = decoded;
+    console.log(id);
+
+    if (!id) {
+      ctx.status = 400;
+      ctx.body = {
+        message: "Token not found"
+      };
+      return;
     }
-    return;
-  }
-  const checkOverview = await employeesOverview.findOne({where: {employee_id: id}});
-  if(!checkOverview)
-  {
-    ctx.status = 404;
-    ctx.body = {
-      message: "Overview Not found"
+
+    const checkOverview = await applicantOverview.findOne({ where: { applicant_id: id } });
+
+    if (!checkOverview) {
+      ctx.status = 404;
+      ctx.body = {
+        message: "Overview Not found"
+      };
+      console.log("Overview Not found");
+      return;
     }
-    console.log("Overview Not found");
-    return;
+
+    console.log("Overview sent Successfully");
+    ctx.status = 200;
+    ctx.body = {
+      message: "Overview sent successfully",
+      data: checkOverview
+    };
+
+  } catch (error) {
+    console.error("Error occurred while fetching overview:", error);
+    ctx.status = 500;
+    ctx.body = {
+      message: "Internal Server Error",
+      error: error.message
+    };
   }
-  console.log("overview sent Successfully")
-  ctx.status = 200;
-  ctx.body = {
-    message:"Overview sent successfully",
-    data: checkOverview
-  }
-}
+};
+
 
 //TO GET PREFERENCE
 const getPreference = async (ctx) =>{
@@ -526,8 +540,8 @@ const getPreference = async (ctx) =>{
     }
     return;
   }
-  const checkPreference = await empPreference
-  .findOne({where: {employee_id: id}});
+  const checkPreference = await applicantPreference
+  .findOne({where: {applicant_id: id}});
   if(!checkPreference)
   {
     ctx.status = 404;
@@ -558,8 +572,8 @@ const getEducation = async (ctx) =>{
     }
     return;
   }
-  const checkEdu = await empEducation
-  .findOne({where: {employee_id: id}});
+  const checkEdu = await applicantEducation
+  .findOne({where: {applicant_id: id}});
   if(!checkEdu)
   {
     ctx.status = 404;
@@ -590,8 +604,8 @@ const getExperience = async (ctx) =>{
     }
     return;
   }
-  const checkExperience = await empExperience
-  .findOne({where: {employee_id: id}});
+  const checkExperience = await applicantExperience
+  .findOne({where: {applicant_id: id}});
   if(!checkExperience)
   {
     ctx.status = 404;

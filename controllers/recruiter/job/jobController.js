@@ -1,9 +1,9 @@
 import * as Yup from 'yup';
 import { verifyToken } from '../../../lib/jwtVerification.js';
-import { Company } from '../../../models/recruiter/companyModel.js';
-import { Job } from '../../../models/recruiter/jobModel.js';
-import { JobApplication } from '../../../models/applicants/jobApplication.js';
 import { rejectApplicantMail, selectApplicantMail } from '../../../lib/otpMail.js';
+import { job } from '../../../models/recruiter/jobModel.js';
+import { jobApplication } from '../../../models/applicants/job/jobApplication.js';
+import { company as CompanyModel } from '../../../models/recruiter/companyModel.js';
 
 // Validation schema using Yup
 const jobSchema = Yup.object().shape({
@@ -27,14 +27,14 @@ const addJob = async (ctx) => {
     await jobSchema.validate(jobData, { abortEarly: false });
 
     // Check if the company exists
-    const company = await Company.findByPk(companyId);
+    const company = await CompanyModel.findByPk(companyId);
     if (!company) {
       ctx.status = 404;
       ctx.body = { message: 'Company not found' };
       return;
     }
 
-    const newJob = await Job.create({ ...jobData, companyId });
+    const newJob = await job.create({ ...jobData, company_id: companyId });
 
     ctx.status = 201;
     ctx.body = {
@@ -72,7 +72,7 @@ const updateJob = async (ctx) => {
     await jobSchema.validate(jobData, { abortEarly: false });
 
     // Check if the company exists
-    const company = await Company.findByPk(id);
+    const company = await CompanyModel.findByPk(id);
     console.log(company)
     if (!company) {
       ctx.status = 404;
@@ -87,7 +87,7 @@ const updateJob = async (ctx) => {
       }
       return;
     }
-    await Job.update({title, description, salary, type, benefits, tags,}, {where: { companyId:id , id: jid}});
+    await job.update({title, description, salary, type, benefits, tags,}, {where: { company_id:id , id: jid}});
     ctx.status = 200;
     ctx.body = {
       message: 'Job updated successfully',
@@ -114,24 +114,25 @@ const updateJob = async (ctx) => {
 const deleteJob = async (ctx) =>{
   const { jid } = ctx.params
   const id = verifyToken(ctx)
+  console.log(id)
   try {
     // Check if the company exists
-    const company = await Company.findByPk(id);
+    const company = await CompanyModel.findByPk(id);
     if (!company) {
       ctx.status = 404;
       ctx.body = { message: 'Company not found' };
       return;
     }
-    const job = await Job.findOne({where: {id:jid}});
+    const checkJob = await job.findOne({where: {id:jid}});
     console.log(job)
-    if(!job){
+    if(!checkJob){
       ctx.status = 404;
       ctx.body = {
         message: "Job not found"
       }
       return;
     }
-    await Job.destroy({where: { companyId:id , id: jid}});
+    await job.destroy({where: { company_id:id , id: jid}});
     ctx.status = 200;
     ctx.body = {
       message: 'Job deleted successfully',
@@ -147,35 +148,50 @@ const deleteJob = async (ctx) =>{
 };
 
 //TO VIEW WHO APPLIED JOBS
-const viewApplication = async (ctx) =>{
-  const id = verifyToken(ctx);
-  console.log(id)
-  if(!id)
-  {
-    ctx.status = 403;
-    ctx.body = {
-      message: "Login session expired"
+const viewApplication = async (ctx) => {
+  try {
+    const id = verifyToken(ctx);
+    console.log(id);
+
+    if (!id) {
+      ctx.status = 403;
+      ctx.body = {
+        message: "Login session expired",
+      };
+      return;
     }
-    return;
+
+    const applied = await jobApplication.findAll({ where: { company_id: id } });
+    console.log(applied);
+
+    const count = await jobApplication.count({ where: { company_id: id } });
+    console.log(count);
+
+    // Check if any applications exist
+    if (applied.length === 0) {
+      ctx.status = 404;
+      ctx.body = {
+        message: "No one applied for the jobs yet",
+      };
+      return;
+    }
+
+    ctx.status = 200;
+    ctx.body = {
+      message: "Applied Users",
+      applied,
+      count: count,
+    };
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    ctx.status = 500;
+    ctx.body = {
+      message: "Error fetching applications",
+      error: error.message,
+    };
   }
-   const applied = await JobApplication.findAll({where: {companyId: id}})
-   const count = await JobApplication.count({where: {company_id: id}})
-   console.log(applied)
-   if(!applied )
-   {
-    ctx.status = 400;
-    ctx.body = {
-      message: "No one applied for the jobs yet"
-    }
-    return;
-   }
-   ctx.status = 200;
-   ctx.body ={
-    message: "Applied Users",
-    applied,
-    count: count
-   }
-}
+};
+
 
 //TO VIEW ALL THE JOBS POSTED
 const viewJobs = async (ctx) =>{
@@ -188,7 +204,7 @@ const viewJobs = async (ctx) =>{
     }
     return;
   }
-  const jobs = await Job.findAll({
+  const jobs = await job.findAll({
     where: { company_id: id }});
   
   if(!jobs)
@@ -214,10 +230,10 @@ const shortListApplication = async (ctx) =>{
   const { interview_date, interview_link } = ctx.request.body 
   const {jobApplicantsId} = ctx.params;
   console.log(jobApplicantsId)
-  const application = await JobApplication.findByPk(jobApplicantsId);
-  const company = await Company.findByPk(application.company_id)
+  const application = await jobApplication.findByPk(jobApplicantsId);
+  const company = await CompanyModel.findByPk(application.company_id)
 
-  const job = await Job.findOne({where: {id: application.job_id}})
+  const checkJob = await job.findOne({where: {id: application.job_id}})
   if(!id){
     ctx.status = 400;
     ctx.body = {
@@ -240,7 +256,7 @@ const shortListApplication = async (ctx) =>{
     }
     return;
   }
-  if(!job)
+  if(!checkJob)
   {
     ctx.status = 404;
     ctx.body = {
@@ -289,7 +305,7 @@ const rescheduleInterview = async (ctx) =>{
     console.log("Please enter the rescheduled Date")
     return;
   }
-  const applicant = await JobApplication.findOne({where: {id: jobApplicantsId}})
+  const applicant = await jobApplication.findOne({where: {id: jobApplicantsId}})
   console.log(applicant)
   if(!applicant)
   {
@@ -324,10 +340,10 @@ const rejectApplication = async (ctx) =>{
    const id = verifyToken(ctx); 
    const {jobApplicantsId} = ctx.params;
    console.log(jobApplicantsId)
-   const application = await JobApplication.findByPk(jobApplicantsId);
-   const company = await Company.findByPk(application.company_id)
+   const application = await jobApplication.findByPk(jobApplicantsId);
+   const company = await CompanyModel.findByPk(application.company_id)
  
-   const job = await Job.findOne({where: {id: application.job_id}})
+   const checkJob = await job.findOne({where: {id: application.job_id}})
    if(!id){
      ctx.status = 400;
      ctx.body = {
@@ -335,7 +351,7 @@ const rejectApplication = async (ctx) =>{
      }
      return;
    }
-   if(!job)
+   if(!checkJob)
    {
      ctx.status = 404;
      ctx.body = {

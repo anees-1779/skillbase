@@ -1,15 +1,15 @@
 import { DataTypes } from "sequelize";
-import {sequelize} from "../../config/database.js";
-import{ Company} from "./companyModel.js";
+import { sequelize } from "../../config/database.js";
+import { company } from "./companyModel.js";
 
-const CompanyLink = sequelize.define("CompanyLink", {
+const companyLink = sequelize.define("company_links", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
     allowNull: false,
   },
-  compURL: {
+  comp_url: {
     type: DataTypes.STRING,
     allowNull: false,
     validate: {
@@ -37,21 +37,21 @@ const CompanyLink = sequelize.define("CompanyLink", {
       isUrl: true,
     },
   },
-  companyId: {
+  company_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: Company,
+      model: company,
       key: "id",
     },
     onDelete: "CASCADE",
   },
 }, {
+  tableName: 'company_links', // Changed table name to snake_case
   timestamps: true,
-  underscored: true
+  underscored: true // Ensures all field names use snake_case
 });
+company.hasOne(companyLink, { foreignKey: "company_id" });
+companyLink.belongsTo(company, { foreignKey: "company_id" });
 
-Company.hasOne(CompanyLink, { foreignKey: "companyId" });
-CompanyLink.belongsTo(Company, { foreignKey: "companyId" });
-
-export {CompanyLink};
+export { companyLink };

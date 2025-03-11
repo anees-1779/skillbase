@@ -1,8 +1,10 @@
-import { Employee } from "../../../models/applicants/EmployeesModel.js";
-import { JobApplication } from "../../../models/applicants/jobApplication.js";
-import { Job } from "../../../models/recruiter/jobModel.js";
+
+import { jobApplication} from "../../../models/applicants/job/jobApplication.js";
+import { job } from "../../../models/recruiter/jobModel.js";
 import { verifyToken } from "../../../lib/jwtVerification.js";
 import { Op, Sequelize } from "sequelize";
+import { applicant } from "../../../models/applicants/details/applicantModel.js";
+import fs from 'fs';
 
 //TO APPLY JOBS
 const applyJob = async (ctx) => {
@@ -32,10 +34,10 @@ const applyJob = async (ctx) => {
     };
     return;
   }
-  const job = await Job.findOne({where: {id:jid}})
-  const employee = await Employee.findOne({where: {id}});
-  const checkStatus = await JobApplication.findOne({where:{job_id: jid, user_id: id}});
-  console.log(job)
+  const checkJob = await job.findOne({where: {id:jid}})
+  const employee = await applicant.findOne({where: {id}});
+  const checkStatus = await jobApplication.findOne({where:{job_id: jid, applicant_id: id}});
+  console.log(checkJob)
   if(checkStatus)
   {
     ctx.status = 400;
@@ -54,16 +56,16 @@ const applyJob = async (ctx) => {
     return;
   }
   try {
-    const jobApply = await JobApplication.create({
+    const jobApply = await jobApplication.create({
       name: employee.name,
       contact: employee.contact,
       email: employee.email,  
       cv: cv.path ,
       job_id:jid,
-      user_id: id,
-      company_id: job.company_id
+      applicant_id: id,
+      company_id: checkJob.company_id
     });
-    await Job.increment('applicantCount', {
+    await job.increment('applicant_Count', {
       by: 1, 
       where: { id: jid }
     });
@@ -112,7 +114,7 @@ const filterJobs = async (ctx) => {
 
     console.log("Filter Conditions:", whereClause);
 
-    const jobs = await Job.findAll({ where: whereClause });
+    const jobs = await job.findAll({ where: whereClause });
 
     console.log("Filtered Jobs:", jobs);
 

@@ -1,15 +1,16 @@
-import { Employee } from '../../models/applicants/employeesModel.js';
-import { generateToken } from '../../lib/jwtVerification.js';
-import { checkPassword, hashedPassword } from '../../lib/hashPassword.js';
+import { generateToken } from '../../../lib/jwtVerification.js';
+import { checkPassword, hashedPassword } from '../../../lib/hashPassword.js';
+import { applicant } from '../../../models/applicants/details/applicantModel.js';
 
 // Check if the user exists by username
-const checkUser = async (username) => await Employee.findOne({ where: { username } });
+const checkUser = async (username) => await applicant.findOne({ where: { username } });
 
 // Check if the email already exists
-const checkEmail = async (email) => await Employee.findOne({ where: { email } });
+const checkEmail = async (email) => await applicant.findOne({ where: { email } });
 
-//CHECK IF THE CONTACT NUMBER ALREADY EXIST 
-const checkContact = async (contact) => await  Employee.findOne({ where: { contact: contact } });
+// Check if the contact number already exists
+const checkContact = async (contact) => await applicant.findOne({ where: { contact } });
+
 
 const registerEmployee = async (ctx) => {
   const { username, password, email, fullName, contact, } = ctx.request.body;
@@ -40,7 +41,7 @@ const registerEmployee = async (ctx) => {
     }
     // Hash password and create the user
     const Password = await hashedPassword(password);
-    const employee = await Employee.create({ username, password: Password, email, name: fullName, contact});
+    const employee = await applicant.create({ username, password: Password, email, name: fullName, contact});
     console.log(`${employee.name} created successfully`)
     ctx.status = 201;
     ctx.body = { message: "User created successfully" };
@@ -53,30 +54,41 @@ const registerEmployee = async (ctx) => {
 // Login user
 const login = async (ctx) => {
   const { password, email } = ctx.request.body;
-  console.log(email,password);
-  if(!email || !password)
-  {
-    ctx.status = 404;
+  console.log(email, password);
+
+  if (!email || !password) {
+    ctx.status = 400; // 400 is more appropriate for missing fields
     ctx.body = {
-      message: "Please enter both username and password"
-    }
-    console.log('login failed')
+      message: "Please enter both email and password",
+    };
+    console.log("Login failed");
     return;
   }
+
   try {
-    const employee = await checkEmail(email);
-    if (employee && await checkPassword(password, employee.password)) {
-      const payload = { id: employee.id, username: employee.username, email: employee.email, name: employee.name };
-      console.log(payload)
-      const token =  generateToken(payload);
-      console.log(token)
-      console.log(employee.name, employee.email)
+    const applicant = await checkEmail(email);
+    if (applicant && (await checkPassword(password, applicant.password))) {
+      const payload = {
+        id: applicant.id,
+        username: applicant.username,
+        email: applicant.email, 
+        name: applicant.name, 
+      };
+
+      console.log(payload);
+      const token = generateToken(payload);
+      console.log(token);
+      console.log(applicant.name, applicant.email);
+
       ctx.status = 200;
-      ctx.body = { message: "Login successful",
-                   token:token,
-                   name: employee.name, 
-                   email: employee.email };
-      console.log(` ${employee.name} Logged in successfull`)
+      ctx.body = {
+        message: "Login successful",
+        token: token,
+        name: applicant.name,
+        email: applicant.email,
+      };
+
+      console.log(`${applicant.name} logged in successfully`);
       return;
     }
 
@@ -87,6 +99,7 @@ const login = async (ctx) => {
     ctx.body = { message: "Internal server error", error: error.message };
   }
 };
+
 
 const message = async (ctx) =>{
   ctx.body = {
