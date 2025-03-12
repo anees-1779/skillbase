@@ -9,7 +9,7 @@ app.use(bodyParser()); // Parse incoming request bodies
 
 // JWT Middleware
 const auth = koaJwt({ secret: JWT_SECRECT }).unless({
-  path: ['/public', '/login', '/register'], // Paths that don't require authentication
+  path: ['/public', '/login', '/register','/build-resume'], // Paths that don't require authentication
 });
 
 // Error handling middleware for JWT

@@ -11,6 +11,7 @@ import { applicantJobRouter } from "./routes/applicant/job/jobRoute.js";
 import { recruiterAuthRouter } from "./routes/recruiter/auth/recruiterAuthRoute.js";
 import { recruiterRouter } from "./routes/recruiter/auth/recruiterRoute.js";
 import serve from "koa-static";
+import { resumeRouter } from "./routes/applicant/resume/resumeRoute.js";
 dotenv.config(); // Load environment variables at the top
 const app = new Koa();
 
@@ -23,7 +24,7 @@ app.use(recruiterAuthRouter.routes()).use(recruiterAuthRouter.allowedMethods());
 app.use(recruiterRouter.routes()).use(recruiterRouter.allowedMethods());
 app.use(applicantJobRouter.routes()).use(applicantJobRouter.allowedMethods());
 app.use(jobRouter.routes()).use(jobRouter.allowedMethods());
-
+app.use(resumeRouter.routes()).use(resumeRouter.allowedMethods());
 const startServer = async () => {
   try {
     await sequelize.authenticate();

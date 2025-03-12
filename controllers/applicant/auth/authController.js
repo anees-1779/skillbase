@@ -100,7 +100,6 @@ const login = async (ctx) => {
   }
 };
 
-
 const message = async (ctx) =>{
   ctx.body = {
     message: "Welcome to the skillbase"
